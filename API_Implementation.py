@@ -19,12 +19,12 @@ def load_graph(path):
     nodes = pd.unique(df[['Source', 'Dest']].values.ravel())
     reverse_adjacency_list = dict.fromkeys(nodes)
     adjacency_list = dict.fromkeys(nodes)
-    for index, row in df.iterrows():
+    for index, row in df.iterrows():    # fill adjacency_list
         if adjacency_list[row[0]] is not None:
             adjacency_list[row[0]].append(row[1])
         else:
             adjacency_list[row[0]] = [row[1]]
-        if reverse_adjacency_list[row[1]] is not None:
+        if reverse_adjacency_list[row[1]] is not None:  #fill reverse_adjacency_list
             reverse_adjacency_list[row[1]].append(row[0])
         else:
             reverse_adjacency_list[row[1]] = [row[0]]
@@ -41,19 +41,19 @@ def calc_pagerank_iteration(beta):
     global page_rank
     global last_page_rank
     global nodes
-    for key in adjacency_list.keys():
-        if key not in reverse_adjacency_list or reverse_adjacency_list[key] is None:
-            page_rank[key] = 0.0
+    for node in adjacency_list.keys():
+        if node not in reverse_adjacency_list or reverse_adjacency_list[node] is None:
+            page_rank[node] = 0.0
         else:
-            val = 0.0
-            for in_node in reverse_adjacency_list[key]:
-                val += float(float(last_page_rank[in_node]) / float(len(adjacency_list[in_node]))) * beta
-                page_rank[key] = val
-    delta = {key: abs(page_rank[key] - last_page_rank[key]) for key in page_rank if key in last_page_rank}
-    leak_val = float(1-sum(page_rank.values())) / float(len(nodes))
-    for key, val in page_rank.items():
-        val += leak_val
-        page_rank[key] = val
+            current_node_value = 0.0
+            for in_node in reverse_adjacency_list[node]:
+                current_node_value += float(last_page_rank[in_node]) / float(len(adjacency_list[in_node])) * beta
+                page_rank[node] = current_node_value
+    delta = sum({key: abs(page_rank[key] - last_page_rank[key]) for key in page_rank if key in last_page_rank}.values())
+    leak_value = float(1-sum(page_rank.values())) / float(len(nodes))
+    for node, current_node_value in page_rank.items():
+        current_node_value += leak_value
+        page_rank[node] = current_node_value
     return delta
 
 
@@ -74,12 +74,12 @@ def calculate_page_rank(beta=0.85, epsilon=0.001, maxIterations=20):
                                    1.0 / float(len(nodes)))  # set initial values of all PageRank to 1/N
     page_rank = dict.fromkeys(adjacency_list.keys(), 0.0)  # values of PageRank will be stored here
     iteration = 1
-    dic = calc_pagerank_iteration(beta)
+    delta_sum = calc_pagerank_iteration(beta)
     last_page_rank = page_rank.copy()
     iteration += 1
-    while iteration < maxIterations and sum(dic.values()) > epsilon:  # loop to update PageRank
+    while iteration < maxIterations and delta_sum > epsilon:  # loop to update PageRank
         last_page_rank = page_rank.copy()
-        dic = calc_pagerank_iteration(beta)
+        delta_sum = calc_pagerank_iteration(beta)
         iteration += 1
 
 
@@ -114,11 +114,7 @@ def get_all_PageRank():
     :return: list of tuples : (node, PageRank value)
     """
     global page_rank
-    x = sorted(page_rank.items(), key=itemgetter(1), reverse=True)
-    print(x)
-    vals = [i[1] for i in x]
-    print(sum(vals))
-    return x
+    return sorted(page_rank.items(), key=itemgetter(1), reverse=True)
 
 
 if __name__ == '__main__':
