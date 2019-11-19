@@ -1,6 +1,9 @@
+__author__ = "Avi Elly 308000017, Elad Cohen- 308468784"
+
 import pandas as pd
 import heapq
 from operator import itemgetter
+
 
 adjacency_list, page_rank, reverse_adjacency_list, last_page_rank = {}, {}, {}, {}
 nodes = []
@@ -105,6 +108,7 @@ def get_top_nodes(n):
     global page_rank
     top_items = heapq.nlargest(n, page_rank.items(), key=itemgetter(1))
     top_items = dict(top_items)
+    print(top_items)
     return top_items
 
 
@@ -118,6 +122,11 @@ def get_all_PageRank():
 
 
 if __name__ == '__main__':
-    load_graph('C:\\Users\\zeavi\\Downloads\\Wikipedia_votes.csv')
+    print("***"*25+"Wikipedia_votes"+"***"*25)
+    load_graph('Wikipedia_votes.csv')
     calculate_page_rank()
-    get_all_PageRank()
+    get_top_nodes(10)
+    print("***" * 25 + "soc-Epinions1" + "***" * 25)
+    load_graph('soc-Epinions1.csv')
+    calculate_page_rank()
+    get_top_nodes(10)
