@@ -76,7 +76,7 @@ def calculate_page_rank(beta=0.85, epsilon=0.001, maxIterations=20):
     last_page_rank = dict.fromkeys(adjacency_list.keys(),
                                    1.0 / float(len(nodes)))  # set initial values of all PageRank to 1/N
     page_rank = dict.fromkeys(adjacency_list.keys(), 0.0)  # values of PageRank will be stored here
-    iteration = 1
+    iteration = 0
     delta_sum = calc_pagerank_iteration(beta)
     last_page_rank = page_rank.copy()
     iteration += 1
